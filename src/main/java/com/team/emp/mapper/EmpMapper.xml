@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.team.emp.mapper.EmpMapper">
+  <resultMap id="BaseResultMap" type="com.team.emp.entity.Emp">
+    <id column="eid" jdbcType="INTEGER" property="eid" />
+    <result column="ename" jdbcType="VARCHAR" property="ename" />
+    <result column="esex" jdbcType="CHAR" property="esex" />
+    <result column="estartime" jdbcType="TIMESTAMP" property="estartime" />
+    <result column="epay" jdbcType="REAL" property="epay" />
+    <result column="did" jdbcType="INTEGER" property="did" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    eid, ename, esex, estartime, epay, emp.did
+  </sql>
+  <select id="selectByExample" parameterType="com.team.emp.entity.EmpExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'false' as QUERYID,
+    <include refid="Base_Column_List" />
+     ,dept.dname from emp inner join dept on emp.did=dept.did
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    ,dept.dname from emp inner join dept on emp.did=dept.did
+    where eid = #{eid,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from emp
+    where eid = #{eid,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.team.emp.entity.Emp">
+    insert into emp (eid, ename, esex, 
+      estartime, epay, did
+      )
+    values (#{eid,jdbcType=INTEGER}, #{ename,jdbcType=VARCHAR}, #{esex,jdbcType=CHAR}, 
+      #{estartime,jdbcType=TIMESTAMP}, #{epay,jdbcType=REAL}, #{did,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.team.emp.entity.Emp">
+    insert into emp
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="eid != null">
+        eid,
+      </if>
+      <if test="ename != null">
+        ename,
+      </if>
+      <if test="esex != null">
+        esex,
+      </if>
+      <if test="estartime != null">
+        estartime,
+      </if>
+      <if test="epay != null">
+        epay,
+      </if>
+      <if test="did != null">
+        did,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="eid != null">
+        #{eid,jdbcType=INTEGER},
+      </if>
+      <if test="ename != null">
+        #{ename,jdbcType=VARCHAR},
+      </if>
+      <if test="esex != null">
+        #{esex,jdbcType=CHAR},
+      </if>
+      <if test="estartime != null">
+        #{estartime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="epay != null">
+        #{epay,jdbcType=REAL},
+      </if>
+      <if test="did != null">
+        #{did,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.team.emp.entity.Emp">
+    update emp
+    <set>
+      <if test="ename != null">
+        ename = #{ename,jdbcType=VARCHAR},
+      </if>
+      <if test="esex != null">
+        esex = #{esex,jdbcType=CHAR},
+      </if>
+      <if test="estartime != null">
+        estartime = #{estartime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="epay != null">
+        epay = #{epay,jdbcType=REAL},
+      </if>
+      <if test="did != null">
+        did = #{did,jdbcType=INTEGER},
+      </if>
+    </set>
+    where eid = #{eid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.team.emp.entity.Emp">
+    update emp
+    set ename = #{ename,jdbcType=VARCHAR},
+      esex = #{esex,jdbcType=CHAR},
+      estartime = #{estartime,jdbcType=TIMESTAMP},
+      epay = #{epay,jdbcType=REAL},
+      did = #{did,jdbcType=INTEGER}
+    where eid = #{eid,jdbcType=INTEGER}
+  </update>
+</mapper>

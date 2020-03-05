@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+	 http://www.springframework.org/schema/beans
+	 http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+	  http://www.springframework.org/schema/context
+	 http://www.springframework.org/schema/context/spring-context-4.3.xsd
+	  http://www.springframework.org/schema/mvc
+	http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+	">
+	<!--spring容器: 提供创建管理对象-->
+	<!--spring整合mybatis-->
+	<!--1.定义数据源:指定连接的数据配置-->
+	<bean id="configurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${driverClassName}"></property>
+		<property name="url" value="${url}"></property>
+		<property name="username" value="${username}"></property>
+		<property name="password" value="${password}"></property>
+	</bean>
+	<!--2.定义sqlSesession工厂-->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!--引用数据源-->
+		<property name="dataSource" ref="dataSource"></property>
+		<!--读取mybatis的配置文件-->
+		<property name="configLocation" value="classpath:mybatis-config.xml"></property>
+	</bean>
+	<!--spring整合dao层，动态生成dao成接口实现类的对象
+          注意:1. sql映射的命名空间必需是接口的限定名，持久化操作的id值必需和接口方法中相同
+              2. 动态生成实现类的bean对象id值，就是接口名称首字母小写
+        -->
+	<bean id="mapper" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!--引入sqlSessionFatory工厂-->
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+		<!--扫描dao层接口，动态生成实现类的对象-->
+		<property name="basePackage" value="com.team.emp.mapper"></property>
+	</bean>
+	<!--扫描业务组件配置-->
+	<context:component-scan base-package="com.team.emp.service.impl"></context:component-scan>
+	<!--spring的事务支持配置-->
+	<!--配置注解事务支持-->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<!-- 事务管理数据库连接池 -->
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	<!-- 开启事务的注解驱动 -->
+	<!-- 注解方式配置事务    Aop-->
+	<tx:annotation-driven proxy-target-class="true" transaction-manager="transactionManager"></tx:annotation-driven>
+
+</beans>
+
